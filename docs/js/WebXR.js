@@ -39,8 +39,7 @@ const WebXR = (props /*: Props */) /*: string */ => {
   useEffect(() => {
     setupMobileDebug();
 
-    let camera, scene, renderer;
-    let mesh;
+    let camera, scene, renderer, loader;
     let stats;
 
     init();
@@ -83,13 +82,16 @@ const WebXR = (props /*: Props */) /*: string */ => {
     // }
 
     function init() {
+      // CANVAS
       const container = document.createElement("div");
       // $FlowFixMe
-      document.body.appendChild(container);
+      document.body.firstElementChild.appendChild(container);
 
+      // SCENE
       // $FlowFixMe
       scene = new THREE.Scene();
 
+      // CAMERA
       camera = new THREE.PerspectiveCamera(
         70,
         window.innerWidth / window.innerHeight,
@@ -97,28 +99,49 @@ const WebXR = (props /*: Props */) /*: string */ => {
         40,
       );
 
+      // RENDERER
       renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
       renderer.setPixelRatio(window.devicePixelRatio);
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.xr.enabled = true;
       container.appendChild(renderer.domElement);
 
+      // LIGHT
       var light = new THREE.HemisphereLight(0xffffff, 0xbbbbff, 1);
       light.position.set(0.5, 1, 0.25);
       scene.add(light);
 
-      const geometry = new THREE.IcosahedronGeometry(0.1, 1);
-      const material = new THREE.MeshPhongMaterial({
-        color: new THREE.Color("rgb(226,35,213)"),
-        shininess: 6,
-        flatShading: true,
-        transparent: 1,
-        opacity: 0.8,
-      });
-
-      mesh = new THREE.Mesh(geometry, material);
-      mesh.position.set(0, 0, -0.5);
-      scene.add(mesh);
+      // MODEL
+      const modelUrl =
+        "https://raw.githubusercontent.com/immersive-web/webxr-samples/main/media/gltf/space/space.gltf";
+      // DOCS: https://threejs.org/docs/#api/en/loaders/Loader
+      // Loaded in /index.html with a <script> tag.
+      // Shit docs - https://threejs.org/docs/#api/en/loaders/Loader.load
+      // Loaders for other formats: https://github.com/mrdoob/three.js/tree/dev/examples/js/loaders
+      loader = new THREE.GLTFLoader();
+      // loader takes in a few arguments loader(model url, onLoad callback, onProgress callback, onError callback)
+      loader.load(
+        // model URL
+        modelUrl,
+        // onLoad callback: what get's called once the full model has loaded
+        function (gltf) {
+          // gltf.scene contains the Three.js object group that represents the 3d object of the model
+          // you can optionally change the position of the model
+          // gltf.scene.position.z = -10; // negative Z moves the model in the opposite direction the camera is facing
+          // gltf.scene.position.y = 5; // positive Y moves the model up
+          // gltf.scene.position.x = 10; // positive X moves hte model to the right
+          scene.add(gltf.scene);
+          console.log("Model added to scene");
+        },
+        // onProgress callback: optional function for showing progress on model load
+        function (xhr) {
+          // console.log((xhr.loaded / xhr.total * 100) + '% loaded' );
+        },
+        // onError callback
+        function (error) {
+          console.error(error);
+        },
+      );
 
       const button = ARButton.createButton(renderer, {
         optionalFeatures: ["dom-overlay", "dom-overlay-for-handheld-ar"],
