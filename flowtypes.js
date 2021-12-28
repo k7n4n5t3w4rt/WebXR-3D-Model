@@ -49,3 +49,7 @@ declare module "../web_modules/history.js" {
 declare module "../web_modules/three.js" {
   declare module.exports: any;
 }
+
+declare module "../web_modules/three.js" {
+  declare module.exports: any;
+}

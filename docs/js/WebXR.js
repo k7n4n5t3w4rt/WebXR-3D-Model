@@ -14,17 +14,9 @@ import {
 import { AppContext } from "./AppContext.js";
 import { ARButton } from "./vendor/ARButton.js";
 import Stats from "./vendor/stats.module.js";
+import { simpleCssSeed } from "./simpleCssSeed.js";
 
-const seed /*: number */ = parseInt(
-  "webxr".split("").reduce(
-    (acc /*: string */, letter /*: string */) /*: string */ => {
-      const letterCode = letter.toLowerCase().charCodeAt(0) - 97 + 1;
-      return acc + letterCode.toString();
-    },
-    "",
-  ),
-);
-setSeed(seed);
+setSeed(simpleCssSeed("WebXR"));
 
 rawStyles({
   html: {
@@ -40,7 +32,7 @@ const [styles] = createStyles({});
 /*::
 type Props = {};
 */
-const Counter = (props /*: Props */) /*: string */ => {
+const WebXR = (props /*: Props */) /*: string */ => {
   //   const [state /*: AppState */, dispatch] = useContext(AppContext);
   //   const [count /*: number */, setCount] = useState(props.count);
 
@@ -70,13 +62,16 @@ const Counter = (props /*: Props */) /*: string */ => {
       // just comment it out when your app is done
       const containerEl = document.getElementById("console-ui");
       if (containerEl !== undefined) {
+        // $FlowFixMe
         eruda.init({
           container: containerEl,
         });
+        // $FlowFixMe
         const devToolEl = containerEl.shadowRoot.querySelector(
           ".eruda-dev-tools",
         );
         if (devToolEl !== undefined) {
+          // $FlowFixMe
           devToolEl.style.height = "40%"; // control the height of the dev tool panel
         }
       }
@@ -89,8 +84,10 @@ const Counter = (props /*: Props */) /*: string */ => {
 
     function init() {
       const container = document.createElement("div");
+      // $FlowFixMe
       document.body.appendChild(container);
 
+      // $FlowFixMe
       scene = new THREE.Scene();
 
       camera = new THREE.PerspectiveCamera(
@@ -129,10 +126,12 @@ const Counter = (props /*: Props */) /*: string */ => {
           root: document.body,
         },
       });
+      // $FlowFixMe
       document.body.appendChild(button);
 
       // add a framerate pane to the page
       createStats();
+      // $FlowFixMe
       document.body.appendChild(stats.domElement); // append the stats panel to the page
       window.addEventListener("resize", onWindowResize, false);
     }
@@ -162,4 +161,4 @@ const Counter = (props /*: Props */) /*: string */ => {
   `;
 };
 
-export default Counter;
+export default WebXR;
